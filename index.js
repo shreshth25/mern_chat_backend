@@ -28,6 +28,13 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
+CreateSocketIO(io)
+
+app.use((req,resp,next)=>{
+    req.io = io
+    next()
+})
+
 //Routes
 app.use('/api/auth', authRouter)
 app.use('/api/holiday', holidayRouter)
@@ -36,7 +43,6 @@ app.use('/api/attendance', attendanceRouter)
 app.use('/api/aichat', aiChatRouter)
 app.use('/api/chat', chatRoutes)
 
-CreateSocketIO(io)
 
 server.listen(PORT, ()=>{
     console.log(`Server Listing at port ${PORT}`)

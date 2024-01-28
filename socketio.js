@@ -1,10 +1,11 @@
 const Chat = require("./models/Chat");
 const PersonalChat = require("./models/PersonalChat");
+const User = require("./models/User");
 const userSocketMap = {};
 
 const CreateSocketIO = async (io) => {
   io.on('connection', (socket) => {
-    console.log('User connected');
+    console.log(`User connected with id ${socket.id}`);
 
     socket.on('disconnect', () => {
       console.log('User disconnected');
@@ -16,8 +17,10 @@ const CreateSocketIO = async (io) => {
       }
     });
 
-    socket.on('setUserId', (userId) => {
-      userSocketMap[userId] = socket.id;
+    socket.on('setUserId', async(userId) => {
+      const user = await User.findById(userId)
+      user.socket = socket.id;
+      await user.save();
     });
 
     socket.on('chat', async (data) => {
@@ -56,19 +59,22 @@ const CreateSocketIO = async (io) => {
       }
 
       await chat.save();
-      const receiverSocketId = userSocketMap[data.receiver];
+      const receiver = await User.findById(data.receiver);
+      const receiverSocketId = receiver.socket
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('personalChat', message_data);
       }
-      const senderSocketId = userSocketMap[data.sender];
+      const sender = await User.findById(data.sender);
+      const senderSocketId = sender.socket
       if (senderSocketId) {
         io.to(senderSocketId).emit('personalChat', message_data)
       }
     });
 
-    socket.on('typing', (data) => {
+    socket.on('typing', async(data) => {
       if (data) {
-        const receiverSocketId = userSocketMap[data.receiver];
+        const receiver = await User.findById(data.receiver);
+        const receiverSocketId = receiver.socket
         if (receiverSocketId) {
           io.to(receiverSocketId).emit('typing', data);
         }
