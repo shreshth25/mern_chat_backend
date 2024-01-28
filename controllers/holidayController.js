@@ -1,6 +1,7 @@
 const Holiday = require("../models/Holiday")
 
 const addHoliday = async(req, resp)=>{
+    console.log("addHoliday")
     const {name, date} = req.body
     const holiday = new Holiday({
         name,
@@ -13,6 +14,7 @@ const addHoliday = async(req, resp)=>{
 
 
 const updateHoliday = async(req, resp)=>{
+    console.log("updateHoliday")
     const {name, date, id} = req.body
     const holiday = await Holiday.findById(id)
     if(holiday)
@@ -31,6 +33,7 @@ const updateHoliday = async(req, resp)=>{
 }
 
 const getHoliday = async(req, resp)=>{
+    console.log("getHoliday")
     const data =await Holiday.find({})
     resp.json({'success':'Success','message':'Holidays', data})
 }

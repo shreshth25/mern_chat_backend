@@ -35,6 +35,11 @@ app.use((req,resp,next)=>{
     next()
 })
 
+app.use((req,resp,next)=>{
+    console.log("Request is Made")
+    next()
+})
+
 //Routes
 app.use('/api/auth', authRouter)
 app.use('/api/holiday', holidayRouter)
